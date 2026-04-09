@@ -7,5 +7,8 @@ export default defineLink(
     linkable: ProductModule.linkable.product,
     isList: true,
   },
-  BrandModule.linkable.brand
+  {
+    linkable: BrandModule.linkable.brand,
+    filterable: ["id", "name"],
+  }
 )

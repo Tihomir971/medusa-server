@@ -61,3 +61,9 @@ npm run seed:serbia   # Seed Serbia-specific data
 ## Environment Variables
 
 `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `COOKIE_SECRET`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `BACKEND_URL`, `DISABLE_ADMIN`, `WORKER_MODE`
+
+## Storefront Extensions Skill
+
+A skill at `~/.claude/skills/medusa-dev/medusa-extensions/SKILL.md` documents all custom extensions for storefront developers (endpoints, data shapes, query field usage).
+
+**Keep it in sync**: whenever you add, remove, or change a custom module, API endpoint, data field, or linking behaviour, update the skill to reflect the change. The skill is the storefront dev's source of truth for what this server exposes beyond stock Medusa.

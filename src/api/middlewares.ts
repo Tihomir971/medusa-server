@@ -11,6 +11,7 @@ import {
 } from "./admin/brands/validators"
 
 export const GetBrandsSchema = createFindParams()
+export const GetProductsByBrandSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -63,6 +64,21 @@ export default defineMiddlewares({
       matcher: "/admin/brands/:id",
       method: "POST",
       middlewares: [validateAndTransformBody(PostAdminUpdateBrand)],
+    },
+    // Store products filtered by brand and/or category
+    {
+      matcher: "/store/products-by-brand",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(GetProductsByBrandSchema, {
+          defaults: [
+            "id", "title", "handle", "thumbnail",
+            "variants.*", "variants.calculated_price.*",
+            "brand.*",
+          ],
+          isList: true,
+        }),
+      ],
     },
     // Store brand list
     {
