@@ -13,23 +13,25 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       : [category_id]
     : undefined
 
-  const filters: Record<string, unknown> = {
-    products: { id: { $ne: null } },
-  }
-
+  // query.graph supports filtering by direct model relations (categories is a
+  // direct ManyToMany on Product, not a module link — so filtering works here)
+  const filters: Record<string, unknown> = {}
   if (categoryIds?.length) {
-    filters.products = {
-      product_categories: {
-        id: categoryIds,
-      },
-    }
+    filters.categories = { id: categoryIds }
   }
 
-  const { data: brands } = await query.index({
-    entity: "brand",
-    fields: ["id", "name"],
+  const { data: products } = await query.graph({
+    entity: "product",
+    fields: ["id", "brand.id", "brand.name"],
     filters,
   })
 
+  const brandMap = new Map<string, { id: string; name: string }>()
+  for (const product of products) {
+    const brand = (product as any).brand
+    if (brand?.id) brandMap.set(brand.id, { id: brand.id, name: brand.name })
+  }
+
+  const brands = Array.from(brandMap.values())
   res.json({ brands, count: brands.length })
 }

@@ -11,7 +11,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const filters: Record<string, unknown> = {}
 
   if (category_id) {
-    filters.product_categories = {
+    filters.categories = {
       id: Array.isArray(category_id) ? category_id : [category_id],
     }
   }
