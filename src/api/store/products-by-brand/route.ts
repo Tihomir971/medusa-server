@@ -4,10 +4,11 @@ import { QueryContext } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
 
-  const { brand_id, category_id, region_id } = req.query as {
+  const { brand_id, category_id, region_id, currency_code } = req.query as {
     brand_id?: string | string[]
     category_id?: string | string[]
-    region_id?: string
+    region_id: string
+    currency_code: string
   }
 
   const filters: Record<string, unknown> = {}
@@ -42,13 +43,11 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     fields: req.queryConfig.fields,
     filters,
     pagination: req.queryConfig.pagination,
-    ...(region_id && {
-      context: {
-        variants: {
-          calculated_price: QueryContext({ region_id }),
-        },
+    context: {
+      variants: {
+        calculated_price: QueryContext({ region_id, currency_code }),
       },
-    }),
+    },
   })
 
   const { count, take, skip } = (metadata ?? {}) as {
