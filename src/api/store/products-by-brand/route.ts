@@ -28,10 +28,16 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     filters,
   })
 
+  const { count, take, skip } = (metadata ?? {}) as {
+    count?: number
+    take?: number
+    skip?: number
+  }
+
   res.json({
     products,
-    count: metadata?.count,
-    limit: metadata?.take,
-    offset: metadata?.skip,
+    count,
+    limit: take,
+    offset: skip,
   })
 }
