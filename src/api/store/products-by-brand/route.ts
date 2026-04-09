@@ -4,12 +4,17 @@ import { QueryContext } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
 
-  const { brand_id, category_id, region_id, currency_code } = req.query as {
+  const { brand_id, category_id, region_id } = req.query as {
     brand_id?: string | string[]
     category_id?: string | string[]
     region_id: string
-    currency_code: string
   }
+
+  const { data: [region] } = await query.graph({
+    entity: "region",
+    fields: ["currency_code"],
+    filters: { id: region_id },
+  })
 
   const filters: Record<string, unknown> = {}
 
@@ -45,7 +50,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     pagination: req.queryConfig.pagination,
     context: {
       variants: {
-        calculated_price: QueryContext({ region_id, currency_code }),
+        calculated_price: QueryContext({ region_id, currency_code: region.currency_code }),
       },
     },
   })

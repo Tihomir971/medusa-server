@@ -18,7 +18,6 @@ export const GetProductsByBrandSchema = createFindParams().extend({
   category_id: z.union([z.string(), z.array(z.string())]).optional(),
   brand_id: z.union([z.string(), z.array(z.string())]).optional(),
   region_id: z.string(),
-  currency_code: z.string(),
 })
 
 export default defineMiddlewares({
