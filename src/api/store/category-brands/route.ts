@@ -32,6 +32,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     if (brand?.id) brandMap.set(brand.id, { id: brand.id, name: brand.name })
   }
 
-  const brands = Array.from(brandMap.values())
+  const brands = Array.from(brandMap.values()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )
   res.json({ brands, count: brands.length })
 }
