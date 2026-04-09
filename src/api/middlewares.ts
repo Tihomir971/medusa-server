@@ -11,6 +11,9 @@ import {
 } from "./admin/brands/validators"
 
 export const GetBrandsSchema = createFindParams()
+export const GetCategoryBrandsSchema = createFindParams().extend({
+  category_id: z.union([z.string(), z.array(z.string())]).optional(),
+})
 export const GetProductsByBrandSchema = createFindParams().extend({
   category_id: z.union([z.string(), z.array(z.string())]).optional(),
   brand_id: z.union([z.string(), z.array(z.string())]).optional(),
@@ -88,7 +91,7 @@ export default defineMiddlewares({
       matcher: "/store/category-brands",
       method: "GET",
       middlewares: [
-        validateAndTransformQuery(GetBrandsSchema, {
+        validateAndTransformQuery(GetCategoryBrandsSchema, {
           defaults: ["id", "name"],
           isList: true,
         }),
