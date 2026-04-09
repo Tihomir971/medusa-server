@@ -63,6 +63,11 @@ module.exports = defineConfig({
 			}
 		},
 
+		// Index Module (required for query.index() and filterable links)
+		{
+			resolve: '@medusajs/index'
+		},
+
 		// ADDED: Redis Locking Module (required for production)
 		{
 			resolve: '@medusajs/medusa/locking',
