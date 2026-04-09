@@ -12,22 +12,36 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const filters: Record<string, unknown> = {}
 
+  // Resolve product IDs via index (brand is ingested into the index via filterable)
+  if (brand_id) {
+    const { data: brandProducts } = await query.index({
+      entity: "product",
+      fields: ["id"],
+      filters: {
+        brand: {
+          id: Array.isArray(brand_id) ? brand_id : [brand_id],
+        },
+      },
+    })
+
+    if (brandProducts.length === 0) {
+      return res.json({ products: [], count: 0, limit: req.queryConfig.pagination?.take, offset: req.queryConfig.pagination?.skip })
+    }
+
+    filters.id = brandProducts.map((p) => p.id)
+  }
+
   if (category_id) {
     filters.categories = {
       id: Array.isArray(category_id) ? category_id : [category_id],
     }
   }
 
-  if (brand_id) {
-    filters.brand = {
-      id: Array.isArray(brand_id) ? brand_id : [brand_id],
-    }
-  }
-
-  const { data: products, metadata } = await query.index({
+  const { data: products, metadata } = await query.graph({
     entity: "product",
-    ...req.queryConfig,
+    fields: req.queryConfig.fields,
     filters,
+    pagination: req.queryConfig.pagination,
     ...(region_id && {
       context: {
         variants: {
