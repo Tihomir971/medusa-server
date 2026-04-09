@@ -83,6 +83,17 @@ export default defineMiddlewares({
         }),
       ],
     },
+    // Store brands filtered by category
+    {
+      matcher: "/store/category-brands",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(GetBrandsSchema, {
+          defaults: ["id", "name"],
+          isList: true,
+        }),
+      ],
+    },
     // Store brand list
     {
       matcher: "/store/brands",
