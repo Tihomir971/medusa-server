@@ -1,13 +1,20 @@
 import { updateProductsWorkflow } from "@medusajs/medusa/core-flows"
+import { StepResponse } from "@medusajs/framework/workflows-sdk"
 import { Modules } from "@medusajs/framework/utils"
+import { LinkDefinition } from "@medusajs/framework/types"
 import { BRAND_MODULE } from "../../modules/brand"
 import BrandModuleService from "../../modules/brand/service"
 import productBrandLink from "../../links/product-brand"
 
+type CompensationData = {
+  oldLinks: LinkDefinition[]
+  newLinks: LinkDefinition[]
+}
+
 updateProductsWorkflow.hooks.productsUpdated(
   async ({ products, additional_data }, { container }) => {
     if (!additional_data || !("brand_id" in additional_data)) {
-      return
+      return new StepResponse([], { oldLinks: [], newLinks: [] })
     }
 
     const link = container.resolve("link")
@@ -23,21 +30,21 @@ updateProductsWorkflow.hooks.productsUpdated(
       filters: { product_id: productIds },
     })
 
+    const oldLinks: LinkDefinition[] = existingLinks.map((l) => ({
+      [Modules.PRODUCT]: { product_id: l.product_id },
+      [BRAND_MODULE]: { brand_id: l.brand_id },
+    }))
+
     // Dismiss existing links
-    if (existingLinks.length > 0) {
-      await link.dismiss(
-        existingLinks.map((l) => ({
-          [Modules.PRODUCT]: { product_id: l.product_id },
-          [BRAND_MODULE]: { brand_id: l.brand_id },
-        }))
-      )
+    if (oldLinks.length > 0) {
+      await link.dismiss(oldLinks)
     }
 
     const brandId = additional_data.brand_id as string | null | undefined
 
     if (!brandId) {
       logger.info("Unlinked brand from products")
-      return
+      return new StepResponse([], { oldLinks, newLinks: [] })
     }
 
     const brandModuleService: BrandModuleService =
@@ -46,13 +53,32 @@ updateProductsWorkflow.hooks.productsUpdated(
     // Throws if brand doesn't exist
     await brandModuleService.retrieveBrand(brandId)
 
-    await link.create(
-      productIds.map((productId) => ({
-        [Modules.PRODUCT]: { product_id: productId },
-        [BRAND_MODULE]: { brand_id: brandId },
-      }))
-    )
+    const newLinks: LinkDefinition[] = productIds.map((productId) => ({
+      [Modules.PRODUCT]: { product_id: productId },
+      [BRAND_MODULE]: { brand_id: brandId },
+    }))
+
+    await link.create(newLinks)
 
     logger.info("Linked brand to products")
+
+    return new StepResponse(newLinks, { oldLinks, newLinks })
+  },
+  async ({ oldLinks, newLinks }: CompensationData, { container }) => {
+    if (!oldLinks && !newLinks) {
+      return
+    }
+
+    const link = container.resolve("link")
+
+    // Dismiss the newly created links
+    if (newLinks?.length) {
+      await link.dismiss(newLinks)
+    }
+
+    // Restore the old links
+    if (oldLinks?.length) {
+      await link.create(oldLinks)
+    }
   }
 )
