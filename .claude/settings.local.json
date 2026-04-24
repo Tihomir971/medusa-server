@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/tihom/.claude/skills/**)",
+      "Read(//c/Users/tihom/.claude/**)",
+      "mcp__medusa__ask_medusa_question"
+    ]
+  }
+}
