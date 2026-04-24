@@ -9,7 +9,7 @@ RUN rm -rf node_modules
 RUN apt-get update && apt-get install -y python3 python3-pip python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm ci --no-audit --no-fund
+RUN npm install --no-audit --no-fund
 
 RUN npm run build
 
