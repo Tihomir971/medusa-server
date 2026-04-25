@@ -9,6 +9,7 @@ import {
   PostAdminCreateBrand,
   PostAdminUpdateBrand,
 } from "./admin/brands/validators"
+import { SearchSchema } from "./store/products/search/route"
 
 export const GetBrandsSchema = createFindParams()
 export const GetCategoryBrandsSchema = createFindParams().extend({
@@ -108,6 +109,12 @@ export default defineMiddlewares({
           isList: true,
         }),
       ],
+    },
+    // Product search
+    {
+      matcher: "/store/products/search",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(SearchSchema)],
     },
   ],
 })

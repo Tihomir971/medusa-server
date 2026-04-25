@@ -27,6 +27,16 @@ module.exports = defineConfig({
 			resolve: './src/modules/brand'
 		},
 
+		// Meilisearch module
+		{
+			resolve: './src/modules/meilisearch',
+			options: {
+				host: process.env.MEILISEARCH_HOST,
+				apiKey: process.env.MEILISEARCH_API_KEY,
+				productIndexName: process.env.MEILISEARCH_PRODUCT_INDEX_NAME || 'products',
+			},
+		},
+
 		// FIXED: New Caching Module (replaces deprecated cache-redis)
 		// Introduced in Medusa v2.11.0
 		{
